@@ -12,7 +12,7 @@ buildroot_defcfg:=$(bao_demos)/guests/linux/buildroot/$(ARCH).config
 buildroot_external:=$(bao_demos)/guests/linux/buildroot/external
 buildroot_overlay:=$(bao_demos)/guests/linux/buildroot/overlay
 
-ifeq ($(DEMO),virtio)
+ifneq ($(filter virtio virtio-andes,$(DEMO)),)
 linux_cfg_frag+=$(bao_demos)/guests/linux/configs/virtio.config
 $(shell grep -qxF "BR2_PACKAGE_BAO_VIRTIO_DM=y" $(buildroot_defcfg) || echo "BR2_PACKAGE_BAO_VIRTIO_DM=y" >> $(buildroot_defcfg))
 $(shell grep -qxF "BR2_PACKAGE_HOST_RUSTC=y" $(buildroot_defcfg) || echo "BR2_PACKAGE_HOST_RUSTC=y" >> $(buildroot_defcfg))
@@ -40,7 +40,7 @@ export BR2_EXTERNAL=$(buildroot_external)
 linux $(buildroot_image): $(linux_patches) $(linux_cfg_frag) $(buildroot_defcfg) | $(linux_src) $(buildroot_src) 
 	$(MAKE) -C $(buildroot_src) defconfig BR2_DEFCONFIG=$(buildroot_defcfg)
 	$(MAKE) -C $(buildroot_src) linux-reconfigure all
-	mv $(buildroot_src)/output/images/*Image $(buildroot_image)
+	cp $(buildroot_src)/output/images/Image $(buildroot_image)
 
 lloader_dir:=$(bao_demos)/guests/linux/lloader
 
